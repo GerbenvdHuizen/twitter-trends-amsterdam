@@ -4,7 +4,7 @@ AWSTemplateFormatVersion: "2010-09-09"
 Parameters:
   DeploymentBucket:
     Type: String
-    Default: test-bucket-lambda-fdx-202204-cf-deployment
+    Default: deployment-fdx-202204-cf
 
 
 Resources:
@@ -14,7 +14,7 @@ Resources:
   BucketTrends:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: test-bucket-lambda-fdx-202204-cf
+      BucketName: bucket-fdx-202204-cf
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
         BlockPublicPolicy: false
@@ -69,6 +69,8 @@ Resources:
               - s3:*
             Effect: Allow
             Resource:
+              - !Sub "arn:aws:s3:::${DeploymentBucket}"
+              - !Sub "arn:aws:s3:::${DeploymentBucket}/*"
               - Fn::GetAtt:
                   - BucketTrends
                   - Arn
@@ -126,6 +128,8 @@ Resources:
               - s3:*
             Effect: Allow
             Resource:
+              - !Sub "arn:aws:s3:::${DeploymentBucket}"
+              - !Sub "arn:aws:s3:::${DeploymentBucket}/*"
               - Fn::GetAtt:
                   - BucketTrends
                   - Arn
@@ -203,8 +207,8 @@ Resources:
               - s3:*
             Effect: Allow
             Resource:
-              - "arn:aws:s3:::test-bucket-lambda-fdx-202204-cf-deployment"
-              - "arn:aws:s3:::test-bucket-lambda-fdx-202204-cf-deployment/*"
+              - !Sub "arn:aws:s3:::${DeploymentBucket}"
+              - !Sub "arn:aws:s3:::${DeploymentBucket}/*"
               - Fn::GetAtt:
                   - BucketTrends
                   - Arn

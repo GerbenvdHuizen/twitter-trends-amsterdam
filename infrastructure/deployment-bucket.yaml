@@ -6,7 +6,7 @@ Resources:
   DeploymentBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: test-bucket-lambda-fdx-202204-cf-deployment
+      BucketName: deployment-fdx-202204-cf
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
         BlockPublicPolicy: false
@@ -14,3 +14,12 @@ Resources:
         RestrictPublicBuckets: false
     UpdateReplacePolicy: Retain
     DeletionPolicy: Retain
+
+# SSM
+
+  DeploymentBucketName:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: "/test/trends/deployment-bucketname"
+      Value: !Ref DeploymentBucket

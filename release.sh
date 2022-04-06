@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-AWS_PROFILE=rfh-sandbox
+AWS_PROFILE=default
 AWS_REGION=eu-west-1
-BUCKET=test-bucket-lambda-fdx-202204-cf-deployment
+BUCKET=deployment-fdx-202204-cf
 
 source create_local_pypi.sh
 source zip_lambdas.sh

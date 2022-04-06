@@ -30,7 +30,8 @@ def get_param(name: str, required: bool = False):
         return None
 
 
-BUCKETNAME = get_param("/test/trends/bucketname")
+DATA_BUCKET = get_param("/test/trends/bucketname")
+DEPLOYMENT_BUCKET = get_param("/test/trends/deployment-bucketname")
 EMR_ROLE = get_param("/test/trends/emr-role")
 EMR_EC2_ROLE = get_param("/test/trends/emr-ec2-role")
 RECORD_DIR = get_param("/test/trends/record-dir")
@@ -45,13 +46,13 @@ def lambda_handler(event, context):
 
     client.run_job_flow(
         Name="spark_job_cluster_trends",
-        LogUri=f"s3://{BUCKETNAME}/prefix/logs",
+        LogUri=f"s3://{DATA_BUCKET}/prefix/logs",
         ReleaseLabel="emr-6.3.0",
         Applications=[{"Name": "Spark"}],
         BootstrapActions=[
             {
                 "Name": "Install Trend spotter dependencies",
-                "ScriptBootstrapAction": {"Path": f"s3://{BUCKETNAME}/local_pypi/install-trends.sh"},
+                "ScriptBootstrapAction": {"Path": f"s3://{DEPLOYMENT_BUCKET}/local_pypi/install-trends.sh"},
             }
         ],
         Configurations=[{
@@ -91,9 +92,9 @@ def lambda_handler(event, context):
                         "/usr/local/lib/python3.7/site-packages/trending_topics/__main__.py",
                         "top_trends_extract",
                         "-input_path",
-                        f"s3://{BUCKETNAME}{RECORD_DIR}/*/*/*/*",
+                        f"s3://{DATA_BUCKET}{RECORD_DIR}/*/*/*/*",
                         "-output_path",
-                        f"s3://{BUCKETNAME}/trends/{trend_output_directory}",
+                        f"s3://{DATA_BUCKET}/trends/{trend_output_directory}",
                     ]
                 }
             }

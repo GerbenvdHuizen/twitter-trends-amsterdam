@@ -34,7 +34,7 @@ BUCKET = get_param("/test/trends/bucketname")
 def lambda_handler(event, context):
     response = {
         "statusCode": 200,
-        "body": json.dumps({}),
+        "body": json.dumps([]),
         "headers": {
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": '*'
@@ -57,9 +57,9 @@ def lambda_handler(event, context):
                 s3_clientdata = s3_object.get()['Body'].read().decode('utf-8')
                 response["body"] = json.dumps([json.loads(json_object)
                                                for json_object in iter(s3_clientdata.splitlines())])
+                return response
 
-        if not response["body"]:
-            response["statusCode"] = 404
+        response["statusCode"] = 404
 
     except ClientError as e:
         error_code = e.response["Error"]["Code"]

@@ -16,7 +16,7 @@ def get_tweets_data(spark: SparkSession, path: str) -> DataFrame:
                 F.substring(F.col("created_at"), 5, 30), "MMM dd HH:mm:ss Z yyyy"
             )
         )
-        .filter(F.col("created_at") > ((F.unix_timestamp(F.current_timestamp()) - (3 * days)).cast('timestamp')))
+        # .filter(F.col("created_at") > ((F.unix_timestamp(F.current_timestamp()) - (3 * days)).cast('timestamp')))
     )
     return tweets
 
@@ -88,7 +88,7 @@ def get_top_n_trends(data: DataFrame, topic_col: Column, top_n: int = 5) -> Data
         )
         .orderBy(F.col("slope").desc())
     )
-    return sloped_data.select(topic_col, F.col("slope")).limit(top_n)
+    return sloped_data.select(topic_col, F.col("slope"), F.col("interval")).limit(top_n)
 
 
 def write_output_path(data: DataFrame, output_path: str) -> None:

@@ -31,7 +31,7 @@ DataFrame.pipe = pipe
 @click.option("-output_path", default=None, type=str)
 @click.option("-interval_duration", default=1, type=int)
 @click.option("-interval_unit", default="hours", type=str)
-@click.option("-top_trending", default=5, type=int)
+@click.option("-top_trending", default=10, type=int)
 @click.option(
     "-hashtags_or_words", default="hashtags", type=click.Choice(["hashtags", "words"])
 )
