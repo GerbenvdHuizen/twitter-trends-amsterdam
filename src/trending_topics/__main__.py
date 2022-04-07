@@ -41,7 +41,19 @@ def pipeline(
     interval_unit,
     top_trending,
     hashtags_or_words,
-):
+) -> None:
+    """
+    Entrypoint for the trends app.
+    :param service: str
+        Currently only top_trends_extract is valid service (API could be added).
+    :param input_path: str
+    :param output_path: str
+    :param interval_duration: int
+    :param interval_unit: str
+    :param top_trending: int
+    :param hashtags_or_words: str
+        Choose whether to do trend analysis on hashtags or words (default hashtags).
+    """
     if service == "top_trends_extract":
         if not input_path or not output_path:
             logging.info("Cancel trends extraction process due to missing paths")
