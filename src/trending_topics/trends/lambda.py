@@ -1,6 +1,6 @@
-import boto3
 import logging
 
+import boto3
 from botocore.exceptions import ClientError
 
 logging.basicConfig(level=logging.INFO)
@@ -43,7 +43,6 @@ def lambda_handler(event, context):
     except KeyError:
         raise ValueError("Missing date value")
 
-
     client.run_job_flow(
         Name="spark_job_cluster_trends",
         LogUri=f"s3://{DATA_BUCKET}/prefix/logs",
@@ -55,18 +54,20 @@ def lambda_handler(event, context):
                 "ScriptBootstrapAction": {"Path": f"s3://{DEPLOYMENT_BUCKET}/local_pypi/install-trends.sh"},
             }
         ],
-        Configurations=[{
-            "Classification": "spark-env",
-            "Configurations": [
-                {
-                    "Classification": "export",
-                    "Properties": {
-                        "PYSPARK_PYTHON": "/usr/bin/python3",
-                        "PYSPARK_DRIVER_PYTHON": "/usr/bin/python3",
-                    },
-                }
-            ],
-        }],
+        Configurations=[
+            {
+                "Classification": "spark-env",
+                "Configurations": [
+                    {
+                        "Classification": "export",
+                        "Properties": {
+                            "PYSPARK_PYTHON": "/usr/bin/python3",
+                            "PYSPARK_DRIVER_PYTHON": "/usr/bin/python3",
+                        },
+                    }
+                ],
+            }
+        ],
         VisibleToAllUsers=True,
         Instances={
             "MasterInstanceType": "m5.xlarge",
@@ -95,8 +96,8 @@ def lambda_handler(event, context):
                         f"s3://{DATA_BUCKET}{RECORD_DIR}/*/*/*/*",
                         "-output_path",
                         f"s3://{DATA_BUCKET}/trends/{trend_output_directory}",
-                    ]
-                }
+                    ],
+                },
             }
-        ]
+        ],
     )

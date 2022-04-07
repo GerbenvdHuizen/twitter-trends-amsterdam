@@ -2,8 +2,7 @@
 
 set -euv -o pipefail
 
-# BUCKET=$(aws ssm get-parameter --name /trends/bucket | jq -r .Parameter.Value)
-BUCKET=deployment-fdx-202204-cf
+BUCKET=$(aws ssm get-parameter --name /test/trends/deployment-bucketname | jq -r .Parameter.Value)
 aws s3 cp s3://$BUCKET/local_pypi/local_pypi.zip ./
 
 unzip local_pypi.zip

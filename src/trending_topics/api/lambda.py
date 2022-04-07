@@ -1,7 +1,7 @@
 import json
-import boto3
 import logging
 
+import boto3
 from botocore.exceptions import ClientError
 
 
@@ -35,10 +35,7 @@ def lambda_handler(event, context):
     response = {
         "statusCode": 200,
         "body": json.dumps([]),
-        "headers": {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": '*'
-        },
+        "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
     }
 
     try:
@@ -48,15 +45,16 @@ def lambda_handler(event, context):
         return response
 
     try:
-        s3 = boto3.resource('s3')
+        s3 = boto3.resource("s3")
         bucket = s3.Bucket(BUCKET)
         for object_summary in bucket.objects.filter(Prefix=f"trends/{date}"):
             key = object_summary.key
             if key.endswith(".json"):
                 s3_object = s3.Object(BUCKET, key)
-                s3_clientdata = s3_object.get()['Body'].read().decode('utf-8')
-                response["body"] = json.dumps([json.loads(json_object)
-                                               for json_object in iter(s3_clientdata.splitlines())])
+                s3_clientdata = s3_object.get()["Body"].read().decode("utf-8")
+                response["body"] = json.dumps(
+                    [json.loads(json_object) for json_object in iter(s3_clientdata.splitlines())]
+                )
                 return response
 
         response["statusCode"] = 404

@@ -1,10 +1,10 @@
-import click
 import logging
 
-from pyspark.sql import SparkSession, DataFrame
+import click
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
-from trending_topics.trends import trends
 
+from trending_topics.trends import trends
 
 logging.basicConfig(level=logging.INFO)
 
@@ -32,17 +32,15 @@ DataFrame.pipe = pipe
 @click.option("-interval_duration", default=1, type=int)
 @click.option("-interval_unit", default="hours", type=str)
 @click.option("-top_trending", default=10, type=int)
-@click.option(
-    "-hashtags_or_words", default="hashtags", type=click.Choice(["hashtags", "words"])
-)
+@click.option("-hashtags_or_words", default="hashtags", type=click.Choice(["hashtags", "words"]))
 def pipeline(
-        service,
-        input_path,
-        output_path,
-        interval_duration,
-        interval_unit,
-        top_trending,
-        hashtags_or_words,
+    service,
+    input_path,
+    output_path,
+    interval_duration,
+    interval_unit,
+    top_trending,
+    hashtags_or_words,
 ):
     if service == "top_trends_extract":
         if not input_path or not output_path:
@@ -67,4 +65,3 @@ def pipeline(
 
 if __name__ == "__main__":
     pipeline()
-

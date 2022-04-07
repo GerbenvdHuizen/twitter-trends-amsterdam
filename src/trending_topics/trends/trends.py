@@ -1,6 +1,6 @@
-from pyspark.sql import SparkSession, Window, DataFrame, Column
-from pyspark.sql import functions as F
 from pyspark.ml.feature import StopWordsRemover
+from pyspark.sql import Column, DataFrame, SparkSession, Window
+from pyspark.sql import functions as F
 
 minutes = 60
 hours = 60 * minutes
@@ -10,13 +10,8 @@ days = 24 * hours
 def get_tweets_data(spark: SparkSession, path: str) -> DataFrame:
     tweets = (
         spark.read.json(path)
-        .withColumn(
-            "created_at",
-            F.to_timestamp(
-                F.substring(F.col("created_at"), 5, 30), "MMM dd HH:mm:ss Z yyyy"
-            )
-        )
-        # .filter(F.col("created_at") > ((F.unix_timestamp(F.current_timestamp()) - (3 * days)).cast('timestamp')))
+        .withColumn("created_at", F.to_timestamp(F.substring(F.col("created_at"), 5, 30), "MMM dd HH:mm:ss Z yyyy"))
+        .filter(F.col("created_at") > ((F.unix_timestamp(F.current_timestamp()) - (3 * days)).cast("timestamp")))
     )
     return tweets
 
@@ -73,16 +68,14 @@ def get_top_n_trends(data: DataFrame, topic_col: Column, top_n: int = 5) -> Data
         .withColumn(
             "is_sequential",
             F.when(
-                F.col("interval").getItem("start")
-                == F.col("previous_interval").getItem("end"),
+                F.col("interval").getItem("start") == F.col("previous_interval").getItem("end"),
                 1,
             ).otherwise(0),
         )
         .withColumn(
             "slope",
             F.when(
-                (F.col("is_sequential") == True)
-                | (F.isnull(F.col("previous_interval"))),
+                (F.col("is_sequential") == True) | (F.isnull(F.col("previous_interval"))),
                 F.col("count") - F.col("count_lag"),
             ).otherwise(0),
         )

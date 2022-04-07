@@ -54,6 +54,11 @@ Resources:
       PolicyDocument:
         Statement:
           - Action:
+              - ssm:*
+            Effect: Allow
+            Resource:
+              - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/test/trends/*"
+          - Action:
               - ec2:Describe*
               - ec2:RunInstances
               - elasticmapreduce:Describe*
@@ -112,6 +117,11 @@ Resources:
     Properties:
       PolicyDocument:
         Statement:
+          - Action:
+              - ssm:*
+            Effect: Allow
+            Resource:
+              - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/test/trends/*"
           - Action:
               - ec2:Describe*
               - ec2:RunInstances

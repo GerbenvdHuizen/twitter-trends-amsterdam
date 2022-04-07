@@ -2,7 +2,7 @@
 
 AWS_PROFILE=default
 AWS_REGION=eu-west-1
-BUCKET=deployment-fdx-202204-cf
+BUCKET=$(aws ssm get-parameter --profile $AWS_PROFILE --region $AWS_REGION --name /test/trends/deployment-bucketname | jq -r .Parameter.Value)
 
 source create_local_pypi.sh
 source zip_lambdas.sh

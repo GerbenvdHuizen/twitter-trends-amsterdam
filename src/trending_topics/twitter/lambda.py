@@ -1,13 +1,13 @@
-import os
 import json
-import tweepy
 import logging
-import boto3
-
-from botocore.exceptions import ClientError
+import os
 from dataclasses import dataclass
-from typing import Optional, Dict, Any
-from datetime import timezone, datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from typing import Any, Dict, Optional
+
+import boto3
+import tweepy
+from botocore.exceptions import ClientError
 
 logging.basicConfig(level=logging.INFO)
 
@@ -19,7 +19,7 @@ GEOCODE = "52.36097,4.88872,25km"
 
 # Twitter API
 BATCH_SIZE = 100
-PAGE_AMOUNT = 1000
+PAGE_AMOUNT = 100
 
 
 def get_param(name: str, required: bool = False):
@@ -48,10 +48,10 @@ def get_param(name: str, required: bool = False):
 DELIVERYSTREAM_NAME = get_param("/test/trends/deliverystream")
 TREND_FUNCTION_NAME = get_param("/test/trends/trend-lambda")
 
-CONSUMER_KEY = ""
-CONSUMER_SECRET = ""
-ACCESS_TOKEN_KEY = ""
-ACCESS_TOKEN_SECRET = ""
+CONSUMER_KEY = get_param("/test/trends/consumer-key")
+CONSUMER_SECRET = get_param("/test/trends/consumer-secret")
+ACCESS_TOKEN_KEY = get_param("/test/trends/access-token-key")
+ACCESS_TOKEN_SECRET = get_param("/test/trends/access-token-secret")
 
 
 def create_api():
@@ -100,14 +100,9 @@ def process_page(page):
     records = []
     for status in page:
         # record = Record.from_dict(status._json)
-        records.append({
-            "Data": bytes((json.dumps(status._json) + "\n"), "utf-8")
-        })
+        records.append({"Data": bytes((json.dumps(status._json) + "\n"), "utf-8")})
 
-    firehose_client.put_record_batch(
-        DeliveryStreamName=DELIVERYSTREAM_NAME,
-        Records=records
-    )
+    firehose_client.put_record_batch(DeliveryStreamName=DELIVERYSTREAM_NAME, Records=records)
 
 
 def lambda_handler(event, context):
@@ -122,19 +117,13 @@ def lambda_handler(event, context):
     # Create API object
     api = create_api()
 
-    for page in tweepy.Cursor(api.search_tweets,
-                              q=GENERAL_SEARCH_TERM,
-                              geocode=GEOCODE,
-                              until=until_date,
-                              count=BATCH_SIZE).pages(PAGE_AMOUNT):
+    for page in tweepy.Cursor(
+        api.search_tweets, q=GENERAL_SEARCH_TERM, geocode=GEOCODE, until=until_date, count=BATCH_SIZE
+    ).pages(PAGE_AMOUNT):
         process_page(page)
 
     boto3.client("lambda").invoke(
         FunctionName=TREND_FUNCTION_NAME,
         InvocationType="Event",
-        Payload=bytes(json.dumps(
-            {
-                "trend_output_directory": utc_time.strftime("%Y-%m-%d")
-            }
-        ), 'utf-8')
+        Payload=bytes(json.dumps({"trend_output_directory": utc_time.strftime("%Y-%m-%d")}), "utf-8"),
     )
